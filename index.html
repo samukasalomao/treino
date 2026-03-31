@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Treino 10K">
+<meta name="theme-color" content="#ffffff">
+<title>Treino — Samuel Salomão</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --green:#639922;--green-l:#EAF3DE;--green-d:#3B6D11;
+  --blue:#378ADD;--blue-l:#E6F1FB;--blue-d:#185FA5;
+  --red:#E24B4A;--red-l:#FCEBEB;--red-d:#A32D2D;
+  --amber:#BA7517;--amber-l:#FAEEDA;--amber-d:#854F0B;
+  --purple:#7F77DD;--purple-l:#EEEDFE;--purple-d:#534AB7;
+  --teal:#1D9E75;--teal-l:#E1F5EE;--teal-d:#0F6E56;
+  --bg:#fff;--bg2:#f5f5f3;--bg3:#eeeeed;
+  --txt:#1a1a18;--txt2:#6b6b67;--txt3:#9e9e9a;
+  --bdr:rgba(0,0,0,0.1);--bdr2:rgba(0,0,0,0.18);
+  --r:10px;--rl:14px;
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#3a3a3c;
+    --txt:#f2f2f7;--txt2:#aeaeb2;--txt3:#6c6c70;
+    --bdr:rgba(255,255,255,0.1);--bdr2:rgba(255,255,255,0.18);
+    --green-l:#1a2e0a;--blue-l:#0a1e38;--red-l:#2e0a0a;
+    --amber-l:#2e1e0a;--purple-l:#1a1838;--teal-l:#041e14}
+}
+html,body{height:100%;font-family:-apple-system,'SF Pro Text',sans-serif;background:var(--bg);color:var(--txt)}
+.shell{display:flex;flex-direction:column;height:100%;max-width:430px;margin:0 auto}
+.topbar{padding:calc(var(--st) + 14px) 16px 12px;background:var(--bg);border-bottom:.5px solid var(--bdr);flex-shrink:0}
+.topbar h1{font-size:17px;font-weight:600}
+.topbar p{font-size:12px;color:var(--txt2);margin-top:2px}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(var(--sb) + 72px)}
+.panel{display:none}.panel.active{display:block}
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:flex;background:var(--bg);border-top:.5px solid var(--bdr);padding-bottom:var(--sb);z-index:100}
+.tb{flex:1;padding:8px 2px 6px;font-size:10px;border:none;background:none;color:var(--txt3);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tb svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tb.active{color:var(--green)}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;margin-bottom:3px}
+.b-easy{background:var(--green-l);color:var(--green-d)}
+.b-tempo{background:var(--amber-l);color:var(--amber-d)}
+.b-interval{background:var(--red-l);color:var(--red-d)}
+.b-long{background:var(--blue-l);color:var(--blue-d)}
+.b-gym{background:var(--purple-l);color:var(--purple-d)}
+.b-race{background:var(--teal);color:#fff}
+.b-rest{background:var(--bg3);color:var(--txt2)}
+.b-z1{background:var(--blue-l);color:var(--blue-d)}
+.b-z2{background:var(--green-l);color:var(--green-d)}
+.b-z3{background:var(--amber-l);color:var(--amber-d)}
+.b-z4{background:var(--red-l);color:var(--red-d)}
+.b-z5{background:var(--red-d);color:#fff}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.sg2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.sc{background:var(--bg2);border-radius:var(--r);padding:12px 10px}
+.sc .lbl{font-size:11px;color:var(--txt2);margin-bottom:4px}
+.sc .val{font-size:20px;font-weight:600}
+.sc .sub{font-size:10px;color:var(--txt3);margin-top:2px}
+.pbar-wrap{margin-bottom:14px}
+.pbar-top{display:flex;justify-content:space-between;font-size:12px;color:var(--txt2);margin-bottom:5px}
+.pbar{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.pbar-fill{height:100%;background:var(--green);border-radius:4px;transition:width .4s}
+.sec-title{font-size:11px;font-weight:600;color:var(--txt3);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.6px}
+
+/* INICIO */
+.greeting h2{font-size:22px;font-weight:700;margin-bottom:3px}
+.greeting p{font-size:13px;color:var(--txt2);margin-bottom:16px}
+.meta-card{background:var(--green);border-radius:var(--rl);padding:16px;margin-bottom:14px;color:#fff}
+.meta-card .mc-lbl{font-size:12px;opacity:.8;margin-bottom:4px}
+.meta-card .mc-val{font-size:26px;font-weight:700}
+.meta-card .mc-sub{font-size:12px;opacity:.8;margin-top:4px}
+.cal-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cal-header span{flex:1;font-size:15px;font-weight:600}
+.cal-nav{width:32px;height:32px;border:.5px solid var(--bdr2);background:var(--bg2);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--txt2)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:14px}
+.cal-dow{font-size:10px;color:var(--txt3);text-align:center;padding:3px 0;font-weight:500}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;font-size:12px;position:relative}
+.cal-day.today{background:var(--green);color:#fff;font-weight:700}
+.cal-day.has-run{background:var(--green-l);color:var(--green-d)}
+.cal-day.has-gym{background:var(--purple-l);color:var(--purple-d)}
+.cal-day.rest-day{color:var(--txt3)}
+.cal-dot{width:4px;height:4px;border-radius:50%;background:currentColor;margin-top:1px}
+.tw-card{background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--rl);padding:14px}
+.tw-lbl{font-size:11px;color:var(--txt2);margin-bottom:6px}
+.tw-name{font-size:15px;font-weight:600;margin-bottom:4px}
+.tw-detail{font-size:12px;color:var(--txt2);line-height:1.4}
+
+/* CORRIDA */
+.week-nav{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.wname{flex:1;font-size:15px;font-weight:600}
+.wsub{font-size:12px;color:var(--txt2);margin-top:1px}
+.nav-btn{width:34px;height:34px;border:.5px solid var(--bdr2);background:var(--bg2);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--txt2);flex-shrink:0}
+.day-card{background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--rl);padding:13px 14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:8px}
+.day-card:active{background:var(--bg2)}
+.day-card.is-rest{opacity:.5;cursor:default}
+.day-card.is-done{border-left:3px solid var(--green)}
+.day-wd{font-size:11px;color:var(--txt3);min-width:26px;padding-top:2px}
+.day-body{flex:1;min-width:0}
+.day-detail{font-size:12px;color:var(--txt2);line-height:1.4;margin-top:2px}
+.day-zone{font-size:11px;margin-top:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.day-log{font-size:11px;color:var(--green-d);margin-top:5px}
+.chk{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--bdr2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:12px}
+.chk.done{background:var(--green);border-color:var(--green);color:#fff}
+
+/* MUSCULACAO */
+.gym-card{background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--rl);padding:14px;margin-bottom:8px}
+.gym-header{display:flex;align-items:center;gap:10px;cursor:pointer}
+.gym-header .gday{font-size:12px;font-weight:600;color:var(--txt3);min-width:28px}
+.gym-header .gtitle{flex:1;font-size:14px;font-weight:600}
+.gym-header .gchev{font-size:12px;color:var(--txt3);transition:transform .2s}
+.gym-header.open .gchev{transform:rotate(180deg)}
+.gym-exs{display:none;flex-direction:column;margin-top:10px}
+.gym-exs.open{display:flex}
+.ex-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:.5px solid var(--bdr)}
+.ex-name{flex:1;font-size:13px}
+.ex-sets{font-size:12px;color:var(--txt2);white-space:nowrap}
+.weight-card{background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--rl);padding:14px;margin-top:4px}
+.wform{display:flex;gap:8px;align-items:center;margin-top:8px}
+.wform input{flex:1;padding:10px 12px;font-size:15px;border:.5px solid var(--bdr2);border-radius:var(--r);background:var(--bg2);color:var(--txt)}
+.wform input:focus{outline:none;border-color:var(--purple)}
+.wform button{padding:10px 16px;background:var(--purple);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap}
+.wh-row{display:flex;justify-content:space-between;font-size:12px;padding:7px 0;border-bottom:.5px solid var(--bdr)}
+.wh-row:last-child{border-bottom:none}
+
+/* EVOLUCAO */
+.chart-wrap{position:relative;width:100%;height:200px;margin-bottom:12px}
+.cf-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.cf-btn{font-size:12px;padding:5px 12px;border:.5px solid var(--bdr2);background:transparent;border-radius:20px;cursor:pointer;color:var(--txt2)}
+.cf-btn.active{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+.log-table{width:100%;border-collapse:collapse;font-size:12px}
+.log-table th{text-align:left;padding:6px 6px;color:var(--txt2);font-weight:400;border-bottom:.5px solid var(--bdr)}
+.log-table td{padding:8px 6px;border-bottom:.5px solid var(--bdr);white-space:nowrap}
+.log-table tr:last-child td{border-bottom:none}
+.evo-block{margin-bottom:20px}
+
+/* DICAS */
+.profile-card{background:var(--green);border-radius:var(--rl);padding:16px;margin-bottom:14px;color:#fff}
+.pc-name{font-size:20px;font-weight:700;margin-bottom:2px}
+.pc-sub{font-size:12px;opacity:.85}
+.pc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.pc-stat{background:rgba(255,255,255,.15);border-radius:8px;padding:8px 6px;text-align:center}
+.pc-stat .ps-val{font-size:16px;font-weight:700}
+.pc-stat .ps-lbl{font-size:10px;opacity:.8;margin-top:2px}
+.zones-card{background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--rl);padding:4px 14px;margin-bottom:8px}
+.zone-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--bdr)}
+.zone-row:last-child{border-bottom:none}
+.zone-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.zi-name{font-size:13px;font-weight:500}
+.zi-fc{font-size:11px;color:var(--txt2);margin-top:1px}
+.zone-bpm{font-size:12px;font-weight:600;color:var(--txt2);white-space:nowrap}
+.tip-card{background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--rl);padding:13px 14px;margin-bottom:8px}
+.tip-card .tt{font-size:13px;font-weight:600;margin-bottom:4px}
+.tip-card .tx{font-size:12px;color:var(--txt2);line-height:1.6}
+
+/* UPLOAD PLANILHA */
+.upload-card{background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--rl);padding:14px;margin-bottom:12px}
+.upload-card .uc-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.upload-card .uc-sub{font-size:12px;color:var(--txt2);line-height:1.5;margin-bottom:10px}
+.upload-label{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:var(--bg2);border:.5px dashed var(--bdr2);border-radius:var(--r);cursor:pointer;font-size:13px;color:var(--txt2)}
+.upload-label:active{background:var(--bg3)}
+.upload-msg{font-size:12px;margin-top:8px;padding:8px 10px;border-radius:8px;display:none}
+.upload-msg.ok{background:var(--green-l);color:var(--green-d)}
+.upload-msg.err{background:var(--red-l);color:var(--red-d)}
+
+/* AVULSO */
+.avulso-form{background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--rl);padding:14px;margin-bottom:12px}
+.avulso-form .af-title{font-size:13px;font-weight:600;margin-bottom:10px}
+.af-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.af-row select,.af-row input{flex:1;min-width:100px;padding:9px 10px;font-size:14px;border:.5px solid var(--bdr2);border-radius:var(--r);background:var(--bg2);color:var(--txt)}
+.af-row select:focus,.af-row input:focus{outline:none;border-color:var(--green)}
+.af-row button{padding:9px 18px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.avulso-list{margin-top:10px}
+.av-item{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:7px 0;border-bottom:.5px solid var(--bdr)}
+.av-item:last-child{border-bottom:none}
+.av-item .av-del{background:none;border:none;color:var(--txt3);cursor:pointer;font-size:14px;padding:2px 4px}
+
+/* MODAL */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center}
+.modal-ov.open{display:flex}
+.modal-sheet{background:var(--bg);border-radius:20px 20px 0 0;padding:20px 20px calc(var(--sb) + 24px);width:100%;max-width:430px}
+.mhandle{width:36px;height:4px;background:var(--bg3);border-radius:2px;margin:0 auto 16px}
+.modal-sheet h3{font-size:16px;font-weight:600;margin-bottom:16px}
+.field{margin-bottom:12px}
+.field label{font-size:12px;color:var(--txt2);display:block;margin-bottom:5px}
+.field input{width:100%;padding:10px 12px;font-size:15px;border:.5px solid var(--bdr2);border-radius:var(--r);background:var(--bg2);color:var(--txt)}
+.field input:focus{outline:none;border-color:var(--green)}
+.mactions{display:flex;gap:10px;margin-top:16px}
+.mactions button{flex:1;padding:13px;font-size:15px;border-radius:var(--r);cursor:pointer;font-weight:500}
+.btn-cancel{background:var(--bg2);border:none;color:var(--txt2)}
+.btn-save{background:var(--green);border:none;color:#fff}
+.empty-msg{text-align:center;padding:2rem 1rem;color:var(--txt2);font-size:13px;line-height:1.8}
+.reg-btn{display:inline-block;margin-top:10px;padding:9px 18px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <h1 id="page-title">Início</h1>
+    <p id="page-sub">Bom treino, Samuel!</p>
+  </div>
+  <div class="content">
+
+    <!-- INÍCIO -->
+    <div id="panel-inicio" class="panel active">
+      <div class="greeting">
+        <h2>Olá, Samuel 👋</h2>
+        <p id="greeting-date"></p>
+      </div>
+
+      <div class="sg">
+        <div class="sc"><div class="lbl">Treinos</div><div class="val" id="i-done">0</div><div class="sub" id="i-done-sub">de 0</div></div>
+        <div class="sc"><div class="lbl">KM</div><div class="val" id="i-km">0</div><div class="sub">rodados</div></div>
+        <div class="sc"><div class="lbl">Progresso</div><div class="val" id="i-pct">0%</div><div class="sub">do plano</div></div>
+      </div>
+      <div class="pbar-wrap">
+        <div class="pbar-top"><span>Plano 10K</span><span id="i-pct2">0%</span></div>
+        <div class="pbar"><div class="pbar-fill" id="i-bar" style="width:0%"></div></div>
+      </div>
+      <div class="sec-title">Calendário do mês</div>
+      <div class="cal-header">
+        <button class="cal-nav" onclick="calNav(-1)">&#8592;</button>
+        <span id="cal-label"></span>
+        <button class="cal-nav" onclick="calNav(1)">&#8594;</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="sec-title">Hoje</div>
+      <div id="today-block"></div>
+    </div>
+
+    <!-- CORRIDA -->
+    <div id="panel-corrida" class="panel">
+
+      <!-- Upload de planilha -->
+      <div class="upload-card">
+        <div class="uc-title">📋 Importar planilha de treino</div>
+        <div class="uc-sub">Suba um arquivo CSV ou JSON para atualizar o plano automaticamente. A planilha nova substitui o plano atual.</div>
+        <label class="upload-label">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Escolher arquivo (.csv ou .json)
+          <input type="file" accept=".csv,.json" onchange="importPlan(event)" style="display:none">
+        </label>
+        <div id="upload-msg" class="upload-msg"></div>
+        <div style="margin-top:10px">
+          <button onclick="downloadPlanTemplate()" style="font-size:12px;background:none;border:none;color:var(--txt2);cursor:pointer;text-decoration:underline;padding:0">Baixar modelo de planilha CSV</button>
+        </div>
+      </div>
+
+      <div class="week-nav">
+        <button class="nav-btn" onclick="changeWeek(-1)">&#8592;</button>
+        <div><div class="wname" id="wk-title">Semana 1</div><div class="wsub" id="wk-sub">Base & Ritmo</div></div>
+        <button class="nav-btn" onclick="changeWeek(1)">&#8594;</button>
+      </div>
+      <div id="days-container"></div>
+    </div>
+
+    <!-- MUSCULAÇÃO -->
+    <div id="panel-musculacao" class="panel">
+
+      <!-- Treinos avulsos -->
+      <div class="avulso-form">
+        <div class="af-title">➕ Registrar treino avulso</div>
+        <div class="af-row">
+          <select id="av-tipo">
+            <option value="corrida">🏃 Corrida</option>
+            <option value="musculacao">💪 Musculação</option>
+          </select>
+          <input type="text" id="av-desc" placeholder="Ex: Fácil 5km, Peito" maxlength="40">
+        </div>
+        <div class="af-row">
+          <input type="number" id="av-km" placeholder="Km (opcional)" inputmode="decimal" step="0.1" min="0" style="flex:1">
+          <input type="text" id="av-pace" placeholder="Pace ex: 5:10" inputmode="text" style="flex:1">
+          <button onclick="saveAvulso()">Salvar</button>
+        </div>
+        <div id="avulso-list" class="avulso-list"></div>
+      </div>
+
+      <div class="sec-title" style="margin-top:0">Divisão semanal</div>
+      <div id="gym-container"></div>
+      <div class="weight-card">
+        <div class="sec-title" style="margin-top:0">Registrar peso corporal</div>
+        <div style="font-size:12px;color:var(--txt2)">Registre semanalmente para acompanhar o ganho de massa</div>
+        <div class="wform">
+          <input type="number" id="inp-weight" placeholder="Ex: 74.5 kg" inputmode="decimal" step="0.1">
+          <button onclick="saveWeight()">Salvar</button>
+        </div>
+        <div id="weight-history" style="margin-top:10px"></div>
+      </div>
+    </div>
+
+    <!-- EVOLUÇÃO -->
+    <div id="panel-evolucao" class="panel">
+      <div class="evo-block">
+        <div class="sec-title" style="margin-top:0">Pace de corrida</div>
+        <div class="sg">
+          <div class="sc"><div class="lbl">Melhor pace</div><div class="val" id="e-best">—</div><div class="sub">registrado</div></div>
+          <div class="sc"><div class="lbl">Média</div><div class="val" id="e-avg">—</div><div class="sub">geral</div></div>
+          <div class="sc"><div class="lbl">Tendência</div><div class="val" id="e-trend">—</div><div class="sub" id="e-tsub">evolução</div></div>
+        </div>
+        <div class="cf-row">
+          <button class="cf-btn active" onclick="setFilter('all',this)">Todos</button>
+          <button class="cf-btn" onclick="setFilter('easy',this)">Fácil</button>
+          <button class="cf-btn" onclick="setFilter('interval',this)">Intervalado</button>
+          <button class="cf-btn" onclick="setFilter('tempo',this)">Tempo</button>
+          <button class="cf-btn" onclick="setFilter('long',this)">Long Run</button>
+        </div>
+        <div class="chart-wrap"><canvas id="paceChart"></canvas></div>
+        <div id="pace-log"></div>
+      </div>
+      <div class="evo-block">
+        <div class="sec-title">Ganho de massa — peso corporal</div>
+        <div class="chart-wrap"><canvas id="weightChart"></canvas></div>
+        <div id="weight-evo"></div>
+      </div>
+    </div>
+
+    <!-- DICAS -->
+    <div id="panel-dicas" class="panel">
+      <div class="profile-card">
+        <div class="pc-name">Samuel Salomão</div>
+        <div class="pc-sub">22 anos &nbsp;·&nbsp; Meta: 10K Sub 45min</div>
+        <div class="pc-stats">
+          <div class="pc-stat"><div class="ps-val">198</div><div class="ps-lbl">FCmax est.</div></div>
+          <div class="pc-stat"><div class="ps-val">4:30</div><div class="ps-lbl">Pace meta</div></div>
+          <div class="pc-stat"><div class="ps-val">Z2–Z4</div><div class="ps-lbl">Zonas foco</div></div>
+        </div>
+      </div>
+      <div class="sec-title">Suas zonas de FC (FCmax 198 bpm)</div>
+      <div class="zones-card">
+        <div class="zone-row">
+          <div class="zone-num" style="background:var(--blue-l);color:var(--blue-d)">Z1</div>
+          <div style="flex:1"><div class="zi-name">Recuperação</div><div class="zi-fc">Caminhada, aquecimento</div></div>
+          <div class="zone-bpm">até 129</div>
+        </div>
+        <div class="zone-row">
+          <div class="zone-num" style="background:var(--green-l);color:var(--green-d)">Z2</div>
+          <div style="flex:1"><div class="zi-name">Base aeróbica ★</div><div class="zi-fc">Fácil, Long Run — 80% do volume</div></div>
+          <div class="zone-bpm">129–149</div>
+        </div>
+        <div class="zone-row">
+          <div class="zone-num" style="background:var(--amber-l);color:var(--amber-d)">Z3</div>
+          <div style="flex:1"><div class="zi-name">Aeróbico moderado</div><div class="zi-fc">Tempo Run — limiar aeróbico</div></div>
+          <div class="zone-bpm">149–163</div>
+        </div>
+        <div class="zone-row">
+          <div class="zone-num" style="background:var(--red-l);color:var(--red-d)">Z4</div>
+          <div style="flex:1"><div class="zi-name">Limiar de lactato ★</div><div class="zi-fc">Intervalado, ritmo alvo 10K</div></div>
+          <div class="zone-bpm">163–178</div>
+        </div>
+        <div class="zone-row">
+          <div class="zone-num" style="background:var(--red-d);color:#fff">Z5</div>
+          <div style="flex:1"><div class="zi-name">VO₂max</div><div class="zi-fc">Tiros curtos, VO2max</div></div>
+          <div class="zone-bpm">178+</div>
+        </div>
+      </div>
+      <div class="sec-title">Dicas personalizadas</div>
+      <div id="tips-list"></div>
+      <div class="sec-title" style="margin-top:20px">Backup dos dados</div>
+      <div style="background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--rl);padding:14px;margin-bottom:8px">
+        <div style="font-size:12px;color:var(--txt2);line-height:1.6;margin-bottom:12px">Salve seus treinos e registros de peso em um arquivo. Use para restaurar se trocar de celular ou limpar o Safari.</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button onclick="exportBackup()" style="padding:12px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer">Exportar backup (.json)</button>
+          <label style="padding:12px;background:var(--bg2);border:.5px solid var(--bdr2);border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;text-align:center;color:var(--txt)">
+            Importar backup
+            <input type="file" accept=".json" onchange="importBackup(event)" style="display:none">
+          </label>
+        </div>
+        <div id="backup-msg" style="font-size:12px;margin-top:10px;display:none"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="tabbar">
+    <button class="tb active" onclick="switchTab('inicio',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Início
+    </button>
+    <button class="tb" onclick="switchTab('corrida',this)">
+      <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Corrida
+    </button>
+    <button class="tb" onclick="switchTab('musculacao',this)">
+      <svg viewBox="0 0 24 24"><path d="M6.5 6.5h11M6.5 17.5h11M2 12h4m12 0h4M6 9.5v5M18 9.5v5"/></svg>
+      Musculação
+    </button>
+    <button class="tb" onclick="switchTab('evolucao',this)">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Evolução
+    </button>
+    <button class="tb" onclick="switchTab('dicas',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Dicas
+    </button>
+  </div>
+</div>
+
+<!-- Modal corrida -->
+<div class="modal-ov" id="modal-run">
+  <div class="modal-sheet">
+    <div class="mhandle"></div>
+    <h3 id="mrun-title">Registrar treino</h3>
+    <div class="field"><label>Pace real (ex: 4:45)</label><input type="text" id="mrun-pace" placeholder="4:45" inputmode="decimal"></div>
+    <div class="field"><label>FC média (bpm)</label><input type="number" id="mrun-fc" placeholder="155" inputmode="numeric"></div>
+    <div class="field"><label>Sensação (1–10)</label><input type="number" id="mrun-sens" min="1" max="10" placeholder="7" inputmode="numeric"></div>
+    <div class="field"><label>Observações</label><input type="text" id="mrun-obs" placeholder="Clima, sensação..."></div>
+    <div class="mactions">
+      <button class="btn-cancel" onclick="closeRunModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveRunLog()">Salvar treino</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const WEEKS=[
+  {name:"Semana 1",sub:"Base & Ritmo",days:[
+    {label:"Seg",type:"rest",name:"Descanso",detail:"Recuperação ativa",badge:"b-rest"},
+    {label:"Ter",type:"easy",name:"Fácil 6 km",detail:"6 km @ 5:45/km · rodagem leve",badge:"b-easy",km:6,zone:"Z2",zb:"b-z2",zd:"FC 129–149 bpm · base aeróbica"},
+    {label:"Qua",type:"gym",name:"Musculação",detail:"Core + Glúteos · 30–40 min",badge:"b-gym"},
+    {label:"Qui",type:"interval",name:"Intervalado 6×1km",detail:"6×1km @ 4:15/km · Recup: 90s trote",badge:"b-interval",km:6,zone:"Z4",zb:"b-z4",zd:"FC 163–178 bpm · limiar de lactato"},
+    {label:"Sex",type:"rest",name:"Descanso",detail:"Recuperação",badge:"b-rest"},
+    {label:"Sáb",type:"tempo",name:"Tempo Run 5 km",detail:"5 km @ 4:42/km · pace limiar",badge:"b-tempo",km:5,zone:"Z3",zb:"b-z3",zd:"FC 149–163 bpm · aeróbico moderado"},
+    {label:"Dom",type:"long",name:"Long Run 10 km",detail:"10 km @ 5:30/km · pace conv.",badge:"b-long",km:10,zone:"Z2",zb:"b-z2",zd:"FC 129–149 bpm · base aeróbica"}
+  ]},
+  {name:"Semana 2",sub:"Desenvolvimento",days:[
+    {label:"Seg",type:"rest",name:"Descanso",detail:"Recuperação ativa",badge:"b-rest"},
+    {label:"Ter",type:"easy",name:"Fácil 7 km",detail:"7 km @ 5:40/km · rodagem base",badge:"b-easy",km:7,zone:"Z2",zb:"b-z2",zd:"FC 129–149 bpm · base aeróbica"},
+    {label:"Qua",type:"gym",name:"Musculação",detail:"Agachamento + Isometria · 30–40 min",badge:"b-gym"},
+    {label:"Qui",type:"interval",name:"Intervalado 5×1,5km",detail:"5×1,5km @ 4:20/km · Recup: 2min",badge:"b-interval",km:7.5,zone:"Z4",zb:"b-z4",zd:"FC 163–178 bpm · limiar de lactato"},
+    {label:"Sex",type:"rest",name:"Descanso",detail:"Recuperação",badge:"b-rest"},
+    {label:"Sáb",type:"tempo",name:"Tempo Run 6 km",detail:"6 km @ 4:40/km · pace limiar",badge:"b-tempo",km:6,zone:"Z3",zb:"b-z3",zd:"FC 149–163 bpm · aeróbico moderado"},
+    {label:"Dom",type:"long",name:"Long Run 11 km",detail:"11 km @ 5:25/km · pace conv.",badge:"b-long",km:11,zone:"Z2",zb:"b-z2",zd:"FC 129–149 bpm · base aeróbica"}
+  ]},
+  {name:"Semana 3",sub:"Intensidade",days:[
+    {label:"Seg",type:"rest",name:"Descanso",detail:"Recuperação ativa",badge:"b-rest"},
+    {label:"Ter",type:"easy",name:"Fácil 7 km",detail:"7 km @ 5:35/km · rodagem base",badge:"b-easy",km:7,zone:"Z2",zb:"b-z2",zd:"FC 129–149 bpm · base aeróbica"},
+    {label:"Qua",type:"gym",name:"Musculação",detail:"Força unilateral · 30–40 min",badge:"b-gym"},
+    {label:"Qui",type:"interval",name:"VO2max 8×400m",detail:"8×400m @ 3:58/km · Recup: 90s",badge:"b-interval",km:3.2,zone:"Z5",zb:"b-z5",zd:"FC 178+ bpm · VO₂max máximo"},
+    {label:"Sex",type:"rest",name:"Descanso",detail:"Recuperação",badge:"b-rest"},
+    {label:"Sáb",type:"tempo",name:"Tempo Run 7 km",detail:"7 km @ 4:38/km · perto do alvo",badge:"b-tempo",km:7,zone:"Z3–Z4",zb:"b-z4",zd:"FC 149–178 bpm · transição limiar"},
+    {label:"Dom",type:"long",name:"Long Run 12 km",detail:"12 km @ 5:20/km · pace conv.",badge:"b-long",km:12,zone:"Z2",zb:"b-z2",zd:"FC 129–149 bpm · base aeróbica"}
+  ]},
+  {name:"Semana 4",sub:"Afunilamento",days:[
+    {label:"Seg",type:"rest",name:"Descanso",detail:"Recuperação ativa",badge:"b-rest"},
+    {label:"Ter",type:"easy",name:"Fácil 5 km",detail:"5 km @ 5:50/km · pernas leves",badge:"b-easy",km:5,zone:"Z2",zb:"b-z2",zd:"FC 129–149 bpm · pernas leves"},
+    {label:"Qua",type:"gym",name:"Musculação leve",detail:"Sem falha muscular · 20–25 min",badge:"b-gym"},
+    {label:"Qui",type:"interval",name:"Ritmo Alvo 3×2km",detail:"3×2km @ 4:30/km · Recup: 3min",badge:"b-interval",km:6,zone:"Z4",zb:"b-z4",zd:"FC 163–178 bpm · ritmo de prova"},
+    {label:"Sex",type:"rest",name:"Descanso",detail:"Recuperação",badge:"b-rest"},
+    {label:"Sáb",type:"easy",name:"Recuperação 4 km",detail:"4 km @ 6:00/km · muito fácil",badge:"b-easy",km:4,zone:"Z1–Z2",zb:"b-z1",zd:"FC até 149 bpm · soltar as pernas"},
+    {label:"Dom",type:"race",name:"PROVA 10km",detail:"10km @ 4:30/km — PACE META!",badge:"b-race",km:10,zone:"Z4",zb:"b-z4",zd:"FC 163–178 bpm · pace meta"}
+  ]}
+];
+
+const GYM=[
+  {label:"Seg",name:"Perna",exs:[
+    {n:"Agachamento livre",s:"4×8–10"},
+    {n:"Leg press 45°",s:"4×10–12"},
+    {n:"Cadeira extensora",s:"3×12"},
+    {n:"Mesa flexora",s:"3×12"},
+    {n:"Panturrilha em pé",s:"4×15"},
+    {n:"Stiff",s:"3×10"}
+  ]},
+  {label:"Ter",name:"Peito & Tríceps",exs:[
+    {n:"Supino reto c/ barra",s:"4×8–10"},
+    {n:"Supino inclinado halteres",s:"3×10–12"},
+    {n:"Crucifixo inclinado",s:"3×12"},
+    {n:"Tríceps corda (polia)",s:"4×12"},
+    {n:"Tríceps testa",s:"3×10"},
+    {n:"Mergulho (paralelas)",s:"3×falha"}
+  ]},
+  {label:"Qua",name:"Costas & Bíceps",exs:[
+    {n:"Puxada frente (barra larga)",s:"4×10"},
+    {n:"Remada curvada",s:"4×8–10"},
+    {n:"Remada sentada (cabo)",s:"3×12"},
+    {n:"Pullover",s:"3×12"},
+    {n:"Rosca direta",s:"4×10"},
+    {n:"Rosca martelo",s:"3×12"}
+  ]},
+  {label:"Qui",name:"Ombro & Peito",exs:[
+    {n:"Desenvolvimento halteres",s:"4×10"},
+    {n:"Elevação lateral",s:"4×15"},
+    {n:"Elevação frontal",s:"3×12"},
+    {n:"Face pull",s:"3×15"},
+    {n:"Supino inclinado c/ barra",s:"4×8–10"},
+    {n:"Crossover (cabo)",s:"3×12"}
+  ]},
+  {label:"Sex",name:"Tríceps & Bíceps",exs:[
+    {n:"Tríceps francês halteres",s:"4×10"},
+    {n:"Extensão unilateral cabo",s:"3×12"},
+    {n:"Tríceps coice",s:"3×12"},
+    {n:"Rosca concentrada",s:"4×10"},
+    {n:"Rosca spider",s:"3×12"},
+    {n:"Rosca 21",s:"3×21"}
+  ]}
+];
+
+const TIPS=[
+  {t:"Suas zonas em prática",x:"FCmax estimada: 198 bpm (220 − 22). Treinos fáceis e Long Run sempre na Z2 (129–149 bpm). Intervalados e ritmo alvo na Z4 (163–178 bpm). Mantenha 80% do volume em Z2."},
+  {t:"Musculação + corrida: como combinar",x:"Perna (Seg) + descanso na Sex é intencional — não faça perna pesada na véspera do Long Run (Dom). Nos dias de musculação, prefira treinar a musculação antes da corrida se for fazer os dois no mesmo dia."},
+  {t:"Progressão de carga na musculação",x:"Aumente a carga 5% por semana enquanto conseguir manter a técnica. Na Semana 4 (afunilamento), reduza o volume mas mantenha a intensidade. Com 22 anos seu potencial de recuperação é alto — use isso a seu favor."},
+  {t:"Nutrição para treino duplo",x:"Com musculação + corrida na semana, mire 1,8–2g de proteína/kg por dia. Pós-treino: proteína + carboidrato nos 30min seguintes. Nos Long Runs (+60min), gel de carboidrato no km 7."},
+  {t:"Sono e recuperação",x:"7–9h de sono é onde o ganho muscular e a adaptação aeróbica acontecem. Priorize sono após Long Run (Dom) e Perna (Seg). Sono ruim prejudica performance mais do que qualquer detalhe de treino."},
+  {t:"Cadência e técnica de corrida",x:"Cadência ideal: 170–180 passos/min. Postura ereta, olhar 10m à frente, aterrissagem no midfoot. Cotovelos a 90°. Uma boa cadência reduz impacto nas articulações e melhora a economia de corrida."},
+  {t:"Estratégia de prova (10K)",x:"Km 1–3: 4:35/km (conservador). Km 4–8: 4:30/km (acelera progressivamente). Km 9–10: sprint final. Não saia no ritmo de outros. Confie nos treinos — você treinou exatamente para esse pace."}
+];
+
+const TYPE_MAP={
+  'Fácil 6 km':'easy','Fácil 7 km':'easy','Fácil 5 km':'easy','Recuperação 4 km':'easy',
+  'Intervalado 6×1km':'interval','Intervalado 5×1,5km':'interval','VO2max 8×400m':'interval','Ritmo Alvo 3×2km':'interval',
+  'Tempo Run 5 km':'tempo','Tempo Run 6 km':'tempo','Tempo Run 7 km':'tempo',
+  'Long Run 10 km':'long','Long Run 11 km':'long','Long Run 12 km':'long','PROVA 10km':'race'
+};
+
+let cWeek=0,cModal=null,cFilter='all',pChart=null,wChart=null;
+let calY=new Date().getFullYear(),calM=new Date().getMonth();
+let logs=JSON.parse(localStorage.getItem('t10k_logs')||'{}');
+let wLogs=JSON.parse(localStorage.getItem('t10k_weight')||'[]');
+let avulsos=JSON.parse(localStorage.getItem('t10k_avulsos')||'[]');
+let customWeeks=JSON.parse(localStorage.getItem('t10k_customWeeks')||'null');
+
+function gk(w,d){return'w'+w+'_d'+d}
+function p2s(s){if(!s)return null;const p=s.trim().replace(',',':').split(':');if(p.length!==2)return null;const m=parseInt(p[0]),sc=parseInt(p[1]);return(isNaN(m)||isNaN(sc))?null:m*60+sc}
+function s2p(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function getWeeks(){return customWeeks||WEEKS;}
+
+const PT={inicio:'Início',corrida:'Corrida',musculacao:'Musculação',evolucao:'Evolução',dicas:'Dicas & Perfil'};
+const PS={inicio:'Bom treino, Samuel!',corrida:'Plano 10K · Sub 45min',musculacao:'Sua divisão semanal',evolucao:'Acompanhe sua evolução',dicas:'22 anos · FCmax 198 bpm'};
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+  document.getElementById('page-title').textContent=PT[id];
+  document.getElementById('page-sub').textContent=PS[id];
+  if(id==='inicio')renderInicio();
+  if(id==='evolucao')renderEvolucao();
+}
+
+// INÍCIO
+function renderInicio(){
+  const today=new Date();
+  const months=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  document.getElementById('greeting-date').textContent=today.getDate()+' de '+months[today.getMonth()]+', '+today.getFullYear();
+  let done=0,km=0;
+  getWeeks().forEach((w,wi)=>w.days.forEach((d,di)=>{if(d.type!=='rest'&&d.type!=='gym'){const k=gk(wi,di);if(logs[k]&&logs[k].done){done++;km+=(d.km||0);}}}));
+  // avulsos contabilizados
+  avulsos.forEach(a=>{done++;km+=(parseFloat(a.km)||0);});
+  const totalPlanned=getWeeks().reduce((acc,w)=>acc+w.days.filter(d=>d.type!=='rest'&&d.type!=='gym').length,0);
+  const pct=Math.round((done/Math.max(totalPlanned,1))*100);
+  document.getElementById('i-done').textContent=done;
+  document.getElementById('i-done-sub').textContent='de '+totalPlanned;
+  document.getElementById('i-km').textContent=km.toFixed(1);
+  document.getElementById('i-pct').textContent=pct+'%';
+  document.getElementById('i-pct2').textContent=pct+'%';
+  document.getElementById('i-bar').style.width=pct+'%';
+  renderCal();
+  renderToday();
+}
+
+function calNav(d){calM+=d;if(calM>11){calM=0;calY++;}else if(calM<0){calM=11;calY--;}renderCal();}
+
+function renderCal(){
+  const MN=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('cal-label').textContent=MN[calM]+' '+calY;
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  ['D','S','T','Q','Q','S','S'].forEach(d=>{const e=document.createElement('div');e.className='cal-dow';e.textContent=d;grid.appendChild(e);});
+  const first=new Date(calY,calM,1).getDay();
+  const total=new Date(calY,calM+1,0).getDate();
+  const todayStr=new Date().toDateString();
+  const runDOWs=[2,4,6,0]; // Tue,Thu,Sat,Sun
+  const gymDOWs=[3]; // Wed
+  for(let i=0;i<first;i++){const e=document.createElement('div');e.className='cal-day';grid.appendChild(e);}
+  for(let d=1;d<=total;d++){
+    const dt=new Date(calY,calM,d);
+    const dow=dt.getDay();
+    const isToday=dt.toDateString()===todayStr;
+    const isRun=runDOWs.includes(dow);
+    const isGym=gymDOWs.includes(dow);
+    let cls='cal-day';
+    if(isToday)cls+=' today';
+    else if(isRun)cls+=' has-run';
+    else if(isGym)cls+=' has-gym';
+    else cls+=' rest-day';
+    const e=document.createElement('div');e.className=cls;
+    e.innerHTML=d+(isRun&&!isToday?'<div class="cal-dot"></div>':'');
+    grid.appendChild(e);
+  }
+}
+
+function renderToday(){
+  const dow=new Date().getDay();
+  const idx=[6,0,1,2,3,4,5][dow];
+  const w=getWeeks()[cWeek];const day=w.days[idx];
+  const tb=document.getElementById('today-block');
+  if(!day||day.type==='rest'){
+    tb.innerHTML='<div class="tw-card"><div class="tw-lbl">Treino de hoje</div><div class="tw-name">Dia de descanso</div><div class="tw-detail" style="margin-top:4px">Recupere-se bem — o descanso é parte do treino</div></div>';
+    return;
+  }
+  const key=gk(cWeek,idx);const done=logs[key]&&logs[key].done;
+  tb.innerHTML=`<div class="tw-card">
+    <div class="tw-lbl">Treino de hoje · ${w.name}</div>
+    <span class="badge ${day.badge}">${day.name}</span>
+    <div class="tw-detail">${day.detail}</div>
+    ${day.zone?`<div class="day-zone" style="margin-top:6px"><span class="badge ${day.zb}" style="font-size:10px">${day.zone}</span><span style="font-size:11px;color:var(--txt2)">${day.zd}</span></div>`:''}
+    ${done?'<div style="font-size:13px;color:var(--green-d);margin-top:10px;font-weight:500">✓ Treino concluído hoje!</div>':`<button class="reg-btn" onclick="openRunModal(${cWeek},${idx})">Registrar treino</button>`}
+  </div>`;
+}
+
+// CORRIDA
+function renderWeek(){
+  const w=getWeeks()[cWeek];
+  document.getElementById('wk-title').textContent=w.name;
+  document.getElementById('wk-sub').textContent=w.sub;
+  const c=document.getElementById('days-container');c.innerHTML='';
+  w.days.forEach((day,i)=>{
+    if(day.type==='gym')return;
+    const key=gk(cWeek,i);const done=logs[key]&&logs[key].done;const isRest=day.type==='rest';
+    const div=document.createElement('div');
+    div.className='day-card'+(isRest?' is-rest':'')+(done?' is-done':'');
+    div.innerHTML=`<div class="day-wd">${day.label}</div>
+      <div class="day-body">
+        <span class="badge ${day.badge}">${day.name}</span>
+        <div class="day-detail">${day.detail}</div>
+        ${day.zone?`<div class="day-zone"><span class="badge ${day.zb}" style="font-size:10px">${day.zone}</span><span style="font-size:11px;color:var(--txt2)">${day.zd}</span></div>`:''}
+        ${done&&logs[key].pace?`<div class="day-log">Pace: ${logs[key].pace} · FC: ${logs[key].fc||'—'} · Sensação: ${logs[key].sensacao||'—'}/10</div>`:''}
+      </div>
+      <div class="chk${done?' done':''}">${done?'✓':''}</div>`;
+    if(!isRest)div.onclick=()=>openRunModal(cWeek,i);
+    c.appendChild(div);
+  });
+}
+function changeWeek(d){cWeek=Math.max(0,Math.min(3,cWeek+d));renderWeek();}
+
+function openRunModal(w,d){
+  cModal={w,d};const day=getWeeks()[w].days[d];const key=gk(w,d);const ex=logs[key]||{};
+  document.getElementById('mrun-title').textContent=day.name;
+  ['pace','fc','sens','obs'].forEach(f=>document.getElementById('mrun-'+f).value=ex[f==='sens'?'sensacao':f]||'');
+  document.getElementById('modal-run').classList.add('open');
+}
+function closeRunModal(){document.getElementById('modal-run').classList.remove('open');cModal=null;}
+function saveRunLog(){
+  const{w,d}=cModal;const key=gk(w,d);
+  logs[key]={done:true,pace:document.getElementById('mrun-pace').value,fc:document.getElementById('mrun-fc').value,sensacao:document.getElementById('mrun-sens').value,obs:document.getElementById('mrun-obs').value,day:getWeeks()[w].days[d].name,week:w+1,type:getWeeks()[w].days[d].type};
+  localStorage.setItem('t10k_logs',JSON.stringify(logs));
+  closeRunModal();renderWeek();
+  const ap=document.getElementById('panel-inicio');if(ap.classList.contains('active'))renderInicio();
+}
+document.getElementById('modal-run').addEventListener('click',function(e){if(e.target===this)closeRunModal();});
+
+// MUSCULAÇÃO
+function renderGym(){
+  const c=document.getElementById('gym-container');c.innerHTML='';
+  GYM.forEach((g,i)=>{
+    const div=document.createElement('div');div.className='gym-card';
+    div.innerHTML=`<div class="gym-header" onclick="toggleGym(${i},this)">
+      <span class="gday">${g.label}</span>
+      <span class="gtitle">${g.name}</span>
+      <span class="gchev">▼</span>
+    </div>
+    <div class="gym-exs" id="gex-${i}">
+      ${g.exs.map(e=>`<div class="ex-row"><span class="ex-name">${e.n}</span><span class="ex-sets">${e.s}</span></div>`).join('')}
+    </div>`;
+    c.appendChild(div);
+  });
+  renderWeightHistory();
+}
+function toggleGym(i,h){const e=document.getElementById('gex-'+i);const o=e.classList.toggle('open');h.classList.toggle('open',o);}
+
+function saveWeight(){
+  const v=parseFloat(document.getElementById('inp-weight').value);
+  if(isNaN(v)||v<30||v>300)return;
+  wLogs.push({kg:v,date:new Date().toLocaleDateString('pt-BR')});
+  localStorage.setItem('t10k_weight',JSON.stringify(wLogs));
+  document.getElementById('inp-weight').value='';
+  renderWeightHistory();
+}
+function renderWeightHistory(){
+  const el=document.getElementById('weight-history');
+  if(!wLogs.length){el.innerHTML='<div style="font-size:12px;color:var(--txt3);padding:8px 0">Nenhum registro ainda</div>';return;}
+  el.innerHTML=wLogs.slice(-5).reverse().map(e=>`<div class="wh-row"><span>${e.date}</span><span style="font-weight:600">${e.kg} kg</span></div>`).join('');
+}
+
+// EVOLUÇÃO
+function setFilter(f,btn){cFilter=f;document.querySelectorAll('.cf-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderPaceChart();}
+
+function getEntries(){
+  const all=Object.entries(logs).filter(([,v])=>v.done&&v.pace&&p2s(v.pace)).map(([k,v])=>({key:k,week:v.week,day:v.day,pace:v.pace,pS:p2s(v.pace),fc:v.fc,sens:v.sensacao,type:TYPE_MAP[v.day]||'other'})).sort((a,b)=>a.key.localeCompare(b.key));
+  return cFilter==='all'?all:all.filter(e=>e.type===cFilter);
+}
+
+function renderPaceChart(){
+  const entries=getEntries();const META=4*60+30;
+  if(pChart){pChart.destroy();pChart=null;}
+  const pl=document.getElementById('pace-log');
+  if(!entries.length){
+    document.getElementById('e-best').textContent='—';document.getElementById('e-avg').textContent='—';document.getElementById('e-trend').textContent='—';
+    pl.innerHTML='<div class="empty-msg">Registre treinos com pace na aba Corrida</div>';return;
+  }
+  const allPaces=Object.values(logs).filter(v=>v.done&&v.pace&&p2s(v.pace)).map(v=>p2s(v.pace));
+  const best=Math.min(...allPaces),avg=Math.round(allPaces.reduce((a,b)=>a+b,0)/allPaces.length);
+  document.getElementById('e-best').textContent=s2p(best);
+  document.getElementById('e-avg').textContent=s2p(avg);
+  if(allPaces.length>=2){const diff=allPaces[allPaces.length-1]-allPaces[0];document.getElementById('e-trend').textContent=(diff<0?'-':diff>0?'+':'=')+s2p(Math.abs(diff));document.getElementById('e-tsub').textContent=diff<0?'mais rápido':diff>0?'mais lento':'estável';}
+  pChart=new Chart(document.getElementById('paceChart'),{type:'line',data:{labels:entries.map(e=>'S'+e.week+' '+e.day.split(' ').slice(0,2).join(' ')),datasets:[{label:'Pace',data:entries.map(e=>+(e.pS/60).toFixed(3)),borderColor:'#639922',backgroundColor:'#63992215',pointBackgroundColor:'#639922',pointRadius:5,tension:0.3,fill:false},{label:'Meta',data:entries.map(()=>+(META/60).toFixed(3)),borderColor:'#378ADD',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+s2p(Math.round(ctx.parsed.y*60))+'/km'}}},scales:{y:{reverse:true,min:3.5,max:6.5,ticks:{callback:v=>s2p(Math.round(v*60)),font:{size:10},color:'#888780'},grid:{color:'rgba(136,135,128,0.12)'}},x:{ticks:{font:{size:10},color:'#888780',maxRotation:35,autoSkip:true},grid:{display:false}}}}});
+  pl.innerHTML='<div style="overflow-x:auto"><table class="log-table"><thead><tr><th>Sem.</th><th>Treino</th><th>Pace</th><th>FC</th><th>Sens.</th></tr></thead><tbody>'+entries.slice().reverse().map(e=>`<tr><td>S${e.week}</td><td style="max-width:90px;overflow:hidden;text-overflow:ellipsis">${e.day}</td><td>${e.pace}</td><td>${e.fc?e.fc+' bpm':'—'}</td><td>${e.sens?e.sens+'/10':'—'}</td></tr>`).join('')+'</tbody></table></div>';
+}
+
+function renderWeightChart(){
+  if(wChart){wChart.destroy();wChart=null;}
+  const el=document.getElementById('weight-evo');
+  if(!wLogs.length){el.innerHTML='<div class="empty-msg">Registre seu peso na aba Musculação</div>';return;}
+  const recent=wLogs.slice(-12);
+  wChart=new Chart(document.getElementById('weightChart'),{type:'line',data:{labels:recent.map(e=>e.date),datasets:[{label:'Peso',data:recent.map(e=>e.kg),borderColor:'#7F77DD',backgroundColor:'#7F77DD15',pointBackgroundColor:'#7F77DD',pointRadius:5,tension:0.3,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.y.toFixed(1)+' kg'}}},scales:{y:{ticks:{callback:v=>v.toFixed(1)+' kg',font:{size:10},color:'#888780'},grid:{color:'rgba(136,135,128,0.12)'}},x:{ticks:{font:{size:10},color:'#888780',maxRotation:35,autoSkip:true},grid:{display:false}}}}});
+  if(wLogs.length>=2){const diff=(wLogs[wLogs.length-1].kg-wLogs[0].kg).toFixed(1);el.innerHTML=`<div style="font-size:13px;color:var(--txt2);padding:8px 0">Variação: <strong style="color:var(--txt)">${diff>0?'+':''}${diff} kg</strong> · ${wLogs.length} registros · Inicial: ${wLogs[0].kg} kg · Atual: ${wLogs[wLogs.length-1].kg} kg</div>`;}
+}
+
+function renderEvolucao(){renderPaceChart();renderWeightChart();}
+
+// DICAS
+document.getElementById('tips-list').innerHTML=TIPS.map(t=>`<div class="tip-card"><div class="tt">${t.t}</div><div class="tx">${t.x}</div></div>`).join('');
+
+// ── IMPORT PLANILHA ──────────────────────────────────────────────────────
+function importPlan(e){
+  const file=e.target.files[0];if(!file)return;
+  const msg=document.getElementById('upload-msg');
+  const ext=file.name.split('.').pop().toLowerCase();
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      let weeks=null;
+      if(ext==='json'){
+        const parsed=JSON.parse(ev.target.result);
+        // aceita array direto ou {weeks:[...]}
+        weeks=Array.isArray(parsed)?parsed:parsed.weeks;
+      } else if(ext==='csv'){
+        weeks=parsePlanCSV(ev.target.result);
+      }
+      if(!weeks||!weeks.length||!weeks[0].days)throw new Error('Formato inválido');
+      customWeeks=weeks;
+      localStorage.setItem('t10k_customWeeks',JSON.stringify(customWeeks));
+      cWeek=0;
+      msg.className='upload-msg ok';msg.style.display='block';
+      msg.textContent='✓ Planilha importada! '+weeks.length+' semanas com '+weeks.reduce((a,w)=>a+w.days.length,0)+' dias.';
+      renderWeek();renderInicio();
+    }catch(err){
+      msg.className='upload-msg err';msg.style.display='block';
+      msg.textContent='Erro: '+err.message+'. Verifique o formato do arquivo.';
+    }
+    e.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function parsePlanCSV(text){
+  // Formato: semana,nome_semana,sub,dia_label,tipo,nome,detalhe,km,zona,zb,zd
+  const lines=text.split('\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('#'));
+  const header=lines[0].toLowerCase().split(',').map(s=>s.trim());
+  const rows=lines.slice(1).map(l=>{
+    const vals=l.split(',').map(s=>s.trim());
+    const o={};header.forEach((h,i)=>o[h]=vals[i]||'');return o;
+  });
+  const weeksMap={};
+  rows.forEach(r=>{
+    const wk=parseInt(r.semana||r.week||1)-1;
+    if(!weeksMap[wk]){
+      weeksMap[wk]={name:r.nome_semana||r.week_name||'Semana '+(wk+1),sub:r.sub||'',days:[]};
+    }
+    const km=parseFloat(r.km)||0;
+    weeksMap[wk].days.push({
+      label:r.dia_label||r.label||'',
+      type:r.tipo||r.type||'rest',
+      name:r.nome||r.name||'',
+      detail:r.detalhe||r.detail||'',
+      badge:'b-'+(r.tipo||r.type||'rest'),
+      km:km||undefined,
+      zone:r.zona||r.zone||undefined,
+      zb:r.zb||undefined,
+      zd:r.zd||undefined
+    });
+  });
+  return Object.keys(weeksMap).sort((a,b)=>a-b).map(k=>weeksMap[k]);
+}
+
+function downloadPlanTemplate(){
+  const csv=`# Modelo de planilha de treino — Samuel 10K
+# Colunas: semana,nome_semana,sub,dia_label,tipo,nome,detalhe,km,zona,zb,zd
+# tipo: rest | easy | interval | tempo | long | gym | race
+semana,nome_semana,sub,dia_label,tipo,nome,detalhe,km,zona,zb,zd
+1,Semana 1,Base & Ritmo,Seg,rest,Descanso,Recuperação ativa,,,, 
+1,Semana 1,Base & Ritmo,Ter,easy,Fácil 6 km,6 km @ 5:45/km · rodagem leve,6,Z2,b-z2,FC 129–149 bpm
+1,Semana 1,Base & Ritmo,Qua,gym,Musculação,Core + Glúteos · 30–40 min,,,,
+1,Semana 1,Base & Ritmo,Qui,interval,Intervalado 6×1km,6×1km @ 4:15/km · Recup: 90s trote,6,Z4,b-z4,FC 163–178 bpm
+1,Semana 1,Base & Ritmo,Sex,rest,Descanso,Recuperação,,,,
+1,Semana 1,Base & Ritmo,Sáb,tempo,Tempo Run 5 km,5 km @ 4:42/km · pace limiar,5,Z3,b-z3,FC 149–163 bpm
+1,Semana 1,Base & Ritmo,Dom,long,Long Run 10 km,10 km @ 5:30/km · pace conv.,10,Z2,b-z2,FC 129–149 bpm
+2,Semana 2,Desenvolvimento,Seg,rest,Descanso,Recuperação ativa,,,,
+2,Semana 2,Desenvolvimento,Ter,easy,Fácil 7 km,7 km @ 5:40/km · rodagem base,7,Z2,b-z2,FC 129–149 bpm
+2,Semana 2,Desenvolvimento,Qua,gym,Musculação,Agachamento + Isometria · 30–40 min,,,,
+2,Semana 2,Desenvolvimento,Qui,interval,Intervalado 5×1,5km,5×1.5km @ 4:20/km,7.5,Z4,b-z4,FC 163–178 bpm
+2,Semana 2,Desenvolvimento,Sex,rest,Descanso,Recuperação,,,,
+2,Semana 2,Desenvolvimento,Sáb,tempo,Tempo Run 6 km,6 km @ 4:40/km,6,Z3,b-z3,FC 149–163 bpm
+2,Semana 2,Desenvolvimento,Dom,long,Long Run 11 km,11 km @ 5:25/km,11,Z2,b-z2,FC 129–149 bpm
+`;
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='modelo_planilha_treino.csv';a.click();URL.revokeObjectURL(url);
+}
+
+// ── AVULSOS ──────────────────────────────────────────────────────────────
+function saveAvulso(){
+  const tipo=document.getElementById('av-tipo').value;
+  const desc=document.getElementById('av-desc').value.trim();
+  const km=document.getElementById('av-km').value;
+  const pace=document.getElementById('av-pace').value.trim();
+  if(!desc){document.getElementById('av-desc').focus();return;}
+  avulsos.push({id:Date.now(),tipo,desc,km:parseFloat(km)||0,pace:pace||'',date:new Date().toLocaleDateString('pt-BR')});
+  localStorage.setItem('t10k_avulsos',JSON.stringify(avulsos));
+  document.getElementById('av-desc').value='';
+  document.getElementById('av-km').value='';
+  document.getElementById('av-pace').value='';
+  renderAvulsos();
+  const ap=document.getElementById('panel-inicio');if(ap.classList.contains('active'))renderInicio();
+}
+
+function deleteAvulso(id){
+  avulsos=avulsos.filter(a=>a.id!==id);
+  localStorage.setItem('t10k_avulsos',JSON.stringify(avulsos));
+  renderAvulsos();
+  const ap=document.getElementById('panel-inicio');if(ap.classList.contains('active'))renderInicio();
+}
+
+function renderAvulsos(){
+  const el=document.getElementById('avulso-list');if(!el)return;
+  if(!avulsos.length){el.innerHTML='<div style="font-size:12px;color:var(--txt3);padding:8px 0">Nenhum treino avulso registrado ainda</div>';return;}
+  el.innerHTML=avulsos.slice().reverse().map(a=>`
+    <div class="av-item">
+      <div>
+        <span style="font-weight:600">${a.tipo==='corrida'?'🏃':'💪'} ${a.desc}</span>
+        ${a.km?`<span style="color:var(--txt2);margin-left:6px">${a.km} km</span>`:''}
+        ${a.pace?`<span style="color:var(--txt2);margin-left:6px">@ ${a.pace}</span>`:''}
+        <div style="font-size:11px;color:var(--txt3);margin-top:2px">${a.date}</div>
+      </div>
+      <button class="av-del" onclick="deleteAvulso(${a.id})">✕</button>
+    </div>`).join('');
+}
+
+// BACKUP — inclui avulsos e customWeeks
+function exportBackup(){
+  const data={logs,wLogs,avulsos,customWeeks,exportedAt:new Date().toLocaleString('pt-BR')};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='treino_samuel_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();URL.revokeObjectURL(url);
+}
+
+function importBackup(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      const msg=document.getElementById('backup-msg');
+      if(!data.logs&&!data.wLogs&&!data.avulsos){msg.style.display='block';msg.style.color='var(--red)';msg.textContent='Arquivo inválido.';return;}
+      if(data.logs){logs=data.logs;localStorage.setItem('t10k_logs',JSON.stringify(logs));}
+      if(data.wLogs){wLogs=data.wLogs;localStorage.setItem('t10k_weight',JSON.stringify(wLogs));}
+      if(data.avulsos){avulsos=data.avulsos;localStorage.setItem('t10k_avulsos',JSON.stringify(avulsos));}
+      if(data.customWeeks){customWeeks=data.customWeeks;localStorage.setItem('t10k_customWeeks',JSON.stringify(customWeeks));}
+      msg.style.display='block';msg.style.color='var(--green-d)';
+      const runCount=Object.values(logs).filter(v=>v.done).length;
+      msg.textContent='Backup restaurado! '+runCount+' treinos, '+avulsos.length+' avulsos e '+wLogs.length+' pesos importados.';
+      renderWeek();renderGym();renderInicio();renderAvulsos();
+    }catch(err){
+      const msg=document.getElementById('backup-msg');msg.style.display='block';msg.style.color='var(--red)';msg.textContent='Erro ao ler o arquivo.';}
+  };
+  reader.readAsText(file);
+}
+
+// INIT
+renderInicio();
+renderWeek();
+renderGym();
+renderAvulsos();
+</script>
+</body>
+</html>
