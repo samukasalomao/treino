@@ -305,6 +305,18 @@ html,body{height:100%;font-family:-apple-system,'SF Pro Text',sans-serif;backgro
       </div>
       <div class="sec-title">Dicas personalizadas</div>
       <div id="tips-list"></div>
+      <div class="sec-title" style="margin-top:20px">Backup dos dados</div>
+      <div style="background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--rl);padding:14px;margin-bottom:8px">
+        <div style="font-size:12px;color:var(--txt2);line-height:1.6;margin-bottom:12px">Salve seus treinos e registros de peso em um arquivo. Use para restaurar se trocar de celular ou limpar o Safari.</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button onclick="exportBackup()" style="padding:12px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer">Exportar backup (.json)</button>
+          <label style="padding:12px;background:var(--bg2);border:.5px solid var(--bdr2);border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;text-align:center;color:var(--txt)">
+            Importar backup
+            <input type="file" accept=".json" onchange="importBackup(event)" style="display:none">
+          </label>
+        </div>
+        <div id="backup-msg" style="font-size:12px;margin-top:10px;display:none"></div>
+      </div>
     </div>
 
   </div>
@@ -651,6 +663,36 @@ function renderEvolucao(){renderPaceChart();renderWeightChart();}
 
 // DICAS
 document.getElementById('tips-list').innerHTML=TIPS.map(t=>`<div class="tip-card"><div class="tt">${t.t}</div><div class="tx">${t.x}</div></div>`).join('');
+
+// BACKUP
+function exportBackup(){
+  const data={logs,wLogs,exportedAt:new Date().toLocaleString('pt-BR')};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='treino_samuel_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();URL.revokeObjectURL(url);
+}
+
+function importBackup(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      const msg=document.getElementById('backup-msg');
+      if(!data.logs&&!data.wLogs){msg.style.display='block';msg.style.color='var(--red)';msg.textContent='Arquivo inválido.';return;}
+      if(data.logs){logs=data.logs;localStorage.setItem('t10k_logs',JSON.stringify(logs));}
+      if(data.wLogs){wLogs=data.wLogs;localStorage.setItem('t10k_weight',JSON.stringify(wLogs));}
+      msg.style.display='block';msg.style.color='var(--green-d)';
+      const runCount=Object.values(logs).filter(v=>v.done).length;
+      msg.textContent='Backup restaurado! '+runCount+' treinos e '+wLogs.length+' registros de peso importados.';
+      renderWeek();renderGym();renderInicio();
+    }catch(err){
+      const msg=document.getElementById('backup-msg');msg.style.display='block';msg.style.color='var(--red)';msg.textContent='Erro ao ler o arquivo.';}
+  };
+  reader.readAsText(file);
+}
 
 // INIT
 renderInicio();
